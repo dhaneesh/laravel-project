@@ -3,26 +3,25 @@ set -e
 
 echo "🔧 Installing Laravel..."
 
-# Install Composer globally if needed (Codespace image already has it)
-composer self-update
-
-# Create new Laravel project
-laravel new laravel-app --dev --force
+# Create Laravel app using Composer if not already present
+if [ ! -d "laravel-app" ]; then
+    composer create-project laravel/laravel laravel-app
+fi
 
 cd laravel-app
 
 # Set up environment
-cp .env.example .env
+cp -n .env.example .env
 php artisan key:generate
 
-# Set database config (already uses MySQL with default root/password)
+# Update DB password in .env (MySQL from Codespaces features)
 sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=password/' .env
 
-# Install JS dependencies
+# Install Node dependencies and build frontend
 npm install && npm run build
 
-# Run database migrations (optional)
+# Run migrations (optional)
 php artisan migrate || true
 
-# Start Laravel server
+# Start Laravel development server
 php artisan serve --host=0.0.0.0 --port=8000
